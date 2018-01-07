@@ -1,0 +1,37 @@
+db.ref_sales.aggregate([
+
+    // Join with product table
+    {
+        $lookup:{
+        from: "ref_products",       
+        localField: "productId",   
+        foreignField: "product_fk", 
+        as: "product_info"        
+        }
+    },
+    {   $unwind:"$product_info" },     
+
+    // Join with seller table
+    {
+        $lookup:{
+        from: "ref_sellers", 
+        localField: "sellerId", 
+        foreignField: "seller_fk",
+        as: "seller_info"
+        }
+    },
+    {   $unwind:"$seller_info" },
+
+    
+
+    // define which fields are you want to fetch
+    {   
+        $project:{
+            _id : 1,
+            salesId : 1,
+            sellingPrice : 1,
+            productName : "$product_info.productName",
+            sellerAddress : "$seller_info.address",
+        } 
+    }
+]);
