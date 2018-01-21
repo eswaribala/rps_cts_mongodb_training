@@ -1,0 +1,450 @@
+use admin
+db.createUser(
+  {
+    user: "myUserAdmin",
+    pwd: "abc123",
+    roles: [ { role: "userAdminAnyDatabase", db: "admin" },
+{ role: "readWrite", db: "test" }
+
+ ]
+  }
+)
+
+
+
+
+db.updateUser("eswari",
+{
+ roles:[ 
+{ role: "readWrite", db: "test" }],
+ pwd:"test@123"
+
+}
+
+
+)
+
+--------------------------
+use admin;
+db.dropUser("user-2")
+db.updateUser("user-1",
+{
+ roles:[
+ {role: "userAdminAnyDatabase", db: "admin" },
+ { role: "readWrite", db: "IATAdb" },
+ { role: "readWrite", db: "cts_db" }],
+ pwd:"test@123"
+
+})
+
+db.getUsers()
+
+db.getUser("user-1")
+
+db.getRole( "readWrite", { showPrivileges: true } )
+
+
+db.createUser(
+  {
+  user: "user-2",
+  pwd: "test@123",
+    roles: [ { role: "userAdminAnyDatabase", db: "admin" },
+    { role: "readWrite", db: "IATAdb" }
+
+ ]
+  }
+)
+
+
+db.updateUser("user-1",
+{
+ roles:[
+  {role: "userAdminAnyDatabase", db: "admin" },
+ { role: "readWrite", db: "IATAdb" },
+ { role: "readWrite", db: "cts_db" }],
+ pwd:"test@123"
+
+})
+db.dropUser("user-2")
+
+
+db.createRole(
+   {
+     role: "manageOpRole",
+     privileges: [
+       { resource: { cluster: true }, actions: [ "killop", "inprog" ] },
+       { resource: { db: "", collection: "" }, actions: [ "killCursors" ] }
+     ],
+     roles: []
+   }
+)
+
+db.createRole(
+   {
+   role: "manageOpRole1",
+     privileges: [
+       { resource: { cluster: true }, actions: [ "killop", "inprog" ] },
+       { resource: { db: "bankdb", collection: "" }, actions: [ "killCursors" ] }
+     ],
+     roles: []
+   }
+)
+
+db.getRoles();
+
+
+db.grantRolesToUser(
+  "user-1",
+  [
+    { role: "readWrite", db: "IATAdb" },
+    { role: "readWrite", db: "cts_db" },
+    { role: "userAdminAnyDatabase", db:"admin" },
+    { role: "manageOpRolenew", db: "admin" },
+  ]
+)
+
+
+
+db.revokePrivilegesFromRole(
+   "associate",
+   [
+     {
+       resource: { db: "products", collection: "" },
+       actions: [ "createCollection", "createIndex", "find" ]
+     },
+     {
+       resource: { db: "products", collection: "orders" },
+       actions: [ "insert" ]
+     }
+   ],
+   { w: "majority" }
+)
+
+------------------------
+mongod --auth --port 27017 --dbpath f:\niit_mongodb
+
+mongo --port 27017 -u "myUserAdmin" -p "abc123" 
+--authenticationDatabase "admin
+
+To authenticate after connecting
+
+
+
+mongo --port 27017
+use admin
+db.auth("myUserAdmin", "abc123" )
+
+Create additional users as needed for your deployment.
+
+use test
+db.createUser(
+  {
+    user: "myTester",
+    pwd: "xyz123",
+    roles: [ { role: "readWrite", db: "test" },
+             { role: "read", db: "reporting" } ]
+  }
+)
+db.updateUser("eswari",
+{
+ roles:[{ role: "readWrite", db: "test" }],
+ pwd:"test@123"
+
+}
+
+
+)
+
+"roles" : [
+   { "role" : "readWrite", "db" : "accounts" },
+   { "role" : "read", "db" : "reporting" },
+   { "role" : "read", "db" : "products" },
+   { "role" : "read", "db" : "sales" }
+]
+
+use admin;
+db.getUsers()
+db.updateUser("user-1",
+{
+ roles:[{ role: "readWrite", db: "IATAdb" },
+ { role: "readWrite", db: "cts_db" }],
+ pwd:"test@123"
+
+})
+db.dropUser("user-2")
+
+mongo --port 27017 -u "myTester" -p "xyz123" --authenticationDatabase "test"
+
+use test
+db.auth("myTester", "xyz123" )
+
+-------------------------------------------
+
+backup and restore
+mongodump --out f:\backup # all databases
+
+mongodump --db Customer --out f:\niit_mongodb\backup
+mongodump --collection userdetails --db myinfo
+
+
+mongorestore --db Customer123 --drop f:\niit_mongodb\backup\Customer
+
+------------------------------------------------
+mongoexport --db myinfo --collection userdetails --out /backup_data/backup/newuserdetails.json --journal
+
+mongoexport --db myinfo --collection userdetails --query "{'interest' : 'MUSIC'}";
+
+mongoexport --db test --collection statemodels --type=csv 
+--fields stateId,name --out f:\niit_mongodb\exports\states.csv
+
+
+mongoexport --db happytripdb --collection statemodels --type=csv 
+--fields stateId,name --out f:\niit_mongodb\exports\statedata.csv
+
+
+mongoimport --db bankdb --collection investments --type csv --headerline --file "F:\mongodb\WIKI-AAPL.csv"
+---------------------------------------------------
+mongodb as window service
+1. create mongod.cfg file in C:\Program Files\MongoDB\Server\3.4
+2. mongod.cfg file contains
+systemLog:
+    destination: file
+    path: c:\data\log\mongod.log
+storage:
+    dbPath: c:\data\db
+3.cmd prompt with admin rights
+mongod --port 14000 --config " C:\Program Files\MongoDB\Server\3.4\mongod.cfg" --install
+
+4. net start MongoDB
+
+5. service started
+
+to stop the service
+net stop MongoDB
+
+---------------------------------------------------------------
+creating replica set 
+
+start C:\mongodb\bin\mongod.exe --config C:\net2\dev1-pc\configs\mongod-primary1.cfg 
+start C:\mongodb\bin\mongod.exe --config C:\net2\dev1-pc\configs\mongod-secondary1.cfg --rest
+start C:\mongodb\bin\mongod.exe --config C:\net2\dev1-pc\configs\mongod-secondary2.cfg
+start C:\mongodb\bin\mongod.exe --config C:\net2\dev1-pc\configs\mongod-secondary3.cfg
+
+	
+Here is how I start 4 mongod's on the same pc to emulate production environment in development environment.
+
+To start mongod you should use separate config for each mongod. Take 4 config's and start mongod's using them:
+
+start C:\mongodb\bin\mongod.exe --config F:\mongodb\serverconfig\dev1_PC\configs\mongod-primary1.cfg 
+start C:\mongodb\bin\mongod.exe --config F:\mongodb\serverconfig\dev2_PC\configs\mongod-secondary1.cfg 
+start C:\mongodb\bin\mongod.exe --config F:\mongodb\serverconfig\dev3_PC\configs\mongod-secondary2.cfg
+start C:\mongodb\bin\mongod.exe --config F:\mongodb\serverconfig\dev4_PC\configs\mongod-secondary3.cfg
+
+Configs look like this:
+
+mongod-primary1.cfg file contents
+
+systemLog:
+    destination: file
+    path: c:\net2\primary1-pc\data\log\mongod.log
+storage:
+    dbPath: c:\net2\primary1-pc\data\db
+net:
+    port: 27018
+replication:
+    replSetName: repl1
+
+mongod-secondary1.cfg file contents
+
+systemLog:
+    destination: file
+    path: c:\net2\secondary1-pc\data\log\mongod.log
+storage:
+    dbPath: c:\net2\secondary1-pc\data\db
+net:
+    port: 27019
+replication:
+    replSetName: repl1
+
+mongod-secondary2.cfg file contents
+
+systemLog:
+    destination: file
+    path: c:\net2\secondary2-pc\data\log\mongod.log
+storage:
+    dbPath: c:\net2\secondary2-pc\data\db
+net:
+    port: 27020
+replication:
+    replSetName: repl1
+
+mongod-secondary3.cfg file contents
+
+systemLog:
+    destination: file
+    path: c:\net2\secondary3-pc\data\log\mongod.log
+storage:
+    dbPath: c:\net2\secondary3-pc\data\db
+net:
+    port: 27021
+replication:
+    replSetName: repl1
+
+
+
+Start mongo --port 27018
+
+Replica configuration, mongo shell provides the predefined object rs which contains the following functions for configuration
+
+initiate() => creates the replica set configuration in current server
+
+status() => gives the current status of replica set to which server is part of
+
+add(serverInfo) => adds the new server (provided as param) in replica set.
+
+addArb(serverInfo) => specialized function for adding the arbiter in the replica set
+
+
+give the command
+rs.initiate()
+rs.status()
+rs.add("VIGNESHBALA:27019")
+rs.status()
+
+create db in primary 
+save
+go to secondary
+rs.slaveOk() // O capital and k small letter
+check db existence
+
+-----------------------
+Sharding
+Set up three(!) config servers
+Start a mongos query router and have the --configdb option string point to the three config servers. Note: the string has to be identical on all mongos
+Restart your going to be shard with the shardsvr option set. This step isn't strictly necessary, but best practise. What this basically does is that mongod will start on a different port (27108), preventing accidental (and potentially problematic) direct access to the shard.
+Connect to the mongos instance.
+Add the shard via the sh.addShard() command.
+Done. Start sharding the collections as needed.
+Mongodb Shard – 1
+
+1
+after creating replicaset, create config server
+
+$ mongod --port 27012 --dbpath datadb
+Mongodb Shard – 2
+
+1
+$ mongod --port 27013 --dbpath datadb2
+Mongodb Shard – 3
+
+1
+$ mongod --port 27014 --dbpath datadb3
+
+$ mongo --port 27011 --host localhost
+mongos> sh.addShard("localhost:27012")
+{ "shardAdded" : "shard0000", "ok" : 1 }
+mongos> sh.addShard("localhost:27013")
+{ "shardAdded" : "shard0001", "ok" : 1 }
+mongos> sh.addShard("localhost:27014")
+{ "shardAdded" : "shard0001", "ok" : 1 }
+mongos> sh.enableSharding("students")
+{ "ok" : 1 }
+mongos> sh.shardCollection("students.grades", {"student_id" : 1})
+{ "collectionsharded" : "students.grades", "ok" : 1 }
+mongos>
+--------------------------------------
+mongostat --host localhost --port 14000
+-----------------------------------------
+mongotop --host localhost --port 14000
+-------------------------------------
+Sharding steps
+Implementing Sharding
+Shards are implemented by using clusters which are nothing but a group of MongoDB instances.
+
+The components of a Shard include
+
+A Shard – This is the basic thing, and this is nothing but a MongoDB instance which holds the subset of the data. In production environments, all shards need to be part of replica sets.
+Config server – This is a mongodb instance which holds metadata about the cluster, basically information about the various mongodb instances which will hold the shard data.
+A Router – This is a mongodb instance which basically is responsible to re-directing the commands send by the client to the right servers.
+
+Step 1) Create a separate database for the config server.
+
+mkdir /data/configdb
+
+Step 2) Start the mongodb instance in configuration mode. Suppose if we have a server named Server D which would be our configuration server, we would need to run the below command to configure the server as a configuration server.
+
+mongod –configdb ServerD: 27019
+
+Step 3) Start the mongos instance by specifying the configuration server
+
+mongos --configdb replsetname/localhost:27018 --port 27023
+
+ 
+Step 4) From the mongo shell connect to the mongo's instance
+
+mongo –host ServerD –port 27017
+
+Step 5) If you have Server A and Server B which needs to be added to the cluster, issue the below commands
+
+sh.addShard("ServerA:27017")
+
+sh.addShard("ServerB:27017")
+
+Step 6) Enable sharding for the database. So if we need to shard the Employeedb database, issue the below command
+
+sh.enableSharding(Employeedb)
+
+Step 7) Enable sharding for the collection. So if we need to shard the Employee collection, issue the below command
+
+Sh.sharedCollection("db.Employee" , { "Employeeid" : 1 , "EmployeeName" : 1})
+----------------------------
+Database Size
+
+The MMAPv1 storage engine limits each database to no more than 16000 data files. This means that a single MMAPv1 database has a maximum size of 32TB. Setting the storage.mmapv1.smallFiles option reduces this limit to 8TB.
+
+Data Size
+
+Changed in version 3.0.
+
+Using the MMAPv1 storage engine, a single mongod instance cannot manage a data set that exceeds maximum virtual memory address space provided by the underlying operating system.
+
+Virtual Memory Limitations :
+
+Linux: 64 terabytes (journaled) - 128 terabytes (not journaled)
+
+Windows Server 2012 R2/Windows 8.1: 64 terabytes (journaled) - 128 terabytes (not journaled)
+
+Windows (otherwise): 4 terabytes (journaled) - 8 terabytes (not journaled)
+
+(The WiredTiger storage engine is not subject to this limitation.)
+------------------------------------
+sharding
+
+mongod --replSet orange --logpath G:\shardingdemo\rs1\1.log 
+
+--dbpath G:\shardingdemo\rs1  --port 27017 --smallfiles --oplogSize 64
+
+mongod --replSet orange --logpath G:\shardingdemo\rs1\2.log 
+
+--dbpath G:\shardingdemo\rs2  --port 27019 --smallfiles --oplogSize 64
+mongod --replSet orange --logpath G:\shardingdemo\rs1\3.log 
+
+--dbpath G:\shardingdemo\rs3  --port 27020 --smallfiles --oplogSize 64
+
+config={_id:"orange",members:[{_id:0,host:"localhost:27017"},{_id:1,host:"localhost:27019"},{_id:2,host:"localhost:27020"}]};
+
+
+rs.initiate(config);
+rs.status();
+use test
+db.cars.insert({_id:1,make:"honda",duedate:"1/2/2021"});
+
+go to
+mongo --port 27019
+rs.slaveOk();
+
+use local;
+show collections
+check oplog
+
+

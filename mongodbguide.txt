@@ -1,0 +1,235 @@
+db.createCollection("students", {
+   validator: {
+      $jsonSchema: {
+         bsonType: "object",
+         required: [ "name", "year", "major", "gpa" ],
+         properties: {
+            name: {
+               bsonType: "string",
+               description: "must be a string and is required"
+            },
+            gender: {
+               bsonType: "string",
+               description: "must be a string and is not required"
+            },
+            year: {
+               bsonType: "int",
+               minimum: 2017,
+               maximum: 3017,
+               exclusiveMaximum: false,
+               description: "must be an integer in [ 2017, 3017 ] and is required"
+            },
+            major: {
+               enum: [ "Math", "English", "Computer Science", "History", null ],
+               description: "can only be one of the enum values and is required"
+            },
+            gpa: {
+               bsonType: [ "double" ],
+               minimum: 0,
+               description: "must be a double and is required"
+            }
+         }
+      }
+   }
+})
+
+
+
+
+
+
+
+
+
+
+
+---------------------------------------------------------
+
+var schema = new Schema({
+  name:    String,
+  binary:  Buffer,
+  living:  Boolean,
+  updated: { type: Date, default: Date.now },
+  age:     { type: Number, min: 18, max: 65 },
+  mixed:   Schema.Types.Mixed,
+  _someId: Schema.Types.ObjectId,
+  array:      [],
+  ofString:   [String],
+  ofNumber:   [Number],
+  ofDates:    [Date],
+  ofBuffer:   [Buffer],
+  ofBoolean:  [Boolean],
+  ofMixed:    [Schema.Types.Mixed],
+  ofObjectId: [Schema.Types.ObjectId],
+  nested: {
+    stuff: { type: String, lowercase: true, trim: true }
+  }
+})
+
+---------------------------------
+schema type options
+var schema1 = new Schema({
+  test: String // `test` is a path of type String
+});
+
+var schema2 = new Schema({
+  test: { type: String } // `test` is a path of type string
+});
+------------------------------------------
+
+var numberSchema = new Schema({
+  integerOnly: {
+    type: Number,
+    get: v => Math.round(v),
+    set: v => Math.round(v)
+  }
+});
+
+var Number = mongoose.model('Number', numberSchema);
+
+var doc = new Number();
+doc.integerOnly = 2.001;
+doc.integerOnly; // 2
+-----------------------------------------------------------
+indexes
+var schema2 = new Schema({
+  test: {
+    type: String,
+    index: true,
+    unique: true // Unique index. If you specify `unique: true`
+    // specifying `index: true` is optional if you do `unique: true`
+  }
+});
+--------------------------------------------------------------
+var breakfastSchema = new Schema({
+      eggs: {
+        type: Number,
+        min: [6, 'Too few eggs'],
+        max: 12
+      },
+      bacon: {
+        type: Number,
+        required: [true, 'Why no bacon?']
+      },
+      drink: {
+        type: String,
+        enum: ['Coffee', 'Tea']
+      }
+    });
+    var Breakfast = db.model('Breakfast', breakfastSchema);
+
+    var badBreakfast = new Breakfast({
+      eggs: 2,
+      bacon: 0,
+      drink: 'Milk'
+    });
+    var error = badBreakfast.validateSync();
+    assert.equal(error.errors['eggs'].message,
+      'Too few eggs');
+    assert.ok(!error.errors['bacon']);
+    assert.equal(error.errors['drink'].message,
+      '`Milk` is not a valid enum value for path `drink`.');
+
+    badBreakfast.bacon = null;
+    error = badBreakfast.validateSync();
+    assert.equal(error.errors['bacon'].message, 'Why no bacon?');
+--------------------------------------------------------------
+String
+
+lowercase: boolean, whether to always call .toLowerCase() on the value
+uppercase: boolean, whether to always call .toUpperCase() on the value
+trim: boolean, whether to always call .trim() on the value
+match: RegExp, creates a validator that checks if the value matches the given regular expression
+enum: Array, creates a validator that checks if the value is in the given array.
+Number
+
+min: Number, creates a validator that checks if the value is greater than or equal to the given minimum.
+max: Number, creates a validator that checks if the value is less than or equal to the given maximum.
+Date
+
+min: Date
+max: Date
+-----------------------------------------------
+queries
+var Person = mongoose.model('Person', yourSchema);
+
+// find each person with a last name matching 'Ghost', selecting the `name` and `occupation` fields
+Person.findOne({ 'name.last': 'Ghost' }, 'name occupation', function (err, person) {
+  if (err) return handleError(err);
+  console.log('%s %s is a %s.', person.name.first, person.name.last, person.occupation) // Space Ghost is a talk show host.
+})
+
+-----------------------------------
+// find each person with a last name matching 'Ghost'
+var query = Person.findOne({ 'name.last': 'Ghost' });
+
+// selecting the `name` and `occupation` fields
+query.select('name occupation');
+
+// execute the query at a later time
+query.exec(function (err, person) {
+  if (err) return handleError(err);
+  console.log('%s %s is a %s.', person.name.first, person.name.last, person.occupation) // Space Ghost is a talk show host.
+})
+-------------------------------------------
+custom validators
+var userSchema = new Schema({
+      phone: {
+        type: String,
+        validate: {
+          validator: function(v) {
+            return /\d{3}-\d{3}-\d{4}/.test(v);
+          },
+          message: '{VALUE} is not a valid phone number!'
+        },
+        required: [true, 'User phone number required']
+      }
+    });
+
+    var User = db.model('user', userSchema);
+    var user = new User();
+    var error;
+
+    user.phone = '555.0123';
+    error = user.validateSync();
+    assert.equal(error.errors['phone'].message,
+      '555.0123 is not a valid phone number!');
+
+    user.phone = '';
+    error = user.validateSync();
+    assert.equal(error.errors['phone'].message,
+      'User phone number required');
+
+    user.phone = '201-555-0123';
+    // Validation succeeds! Phone number is defined
+    // and fits `DDD-DDD-DDDD`
+    error = user.validateSync();
+    assert.equal(error, null);
+---------------------------------------------------------
+var toySchema = new Schema({
+      color: String,
+      name: String
+    });
+
+    var Toy = db.model('Toy', toySchema);
+
+    var validator = function (value) {
+      return /blue|green|white|red|orange|periwinkle/i.test(value);
+    };
+    Toy.schema.path('color').validate(validator,
+      'Color `{VALUE}` not valid', 'Invalid color');
+
+    var toy = new Toy({ color: 'grease'});
+
+    toy.save(function (err) {
+      // err is our ValidationError object
+      // err.errors.color is a ValidatorError object
+      assert.equal(err.errors.color.message, 'Color `grease` not valid');
+      assert.equal(err.errors.color.kind, 'Invalid color');
+      assert.equal(err.errors.color.path, 'color');
+      assert.equal(err.errors.color.value, 'grease');
+      assert.equal(err.name, 'ValidationError');
+    });
+  -------------------------------------------
+
+

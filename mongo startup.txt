@@ -1,0 +1,990 @@
+32 bit machine
+mongod --port 27017 --storageEngine=mmapv1 --dbpath path
+
+
+
+Go to
+C:\Program Files\MongoDB 2.6 Standard\bin
+
+
+
+
+
+mongod --dbpath F:\NIIT_Mongodb --port 27017
+
+
+replica set
+
+mongod --port "PORT" --dbpath "YOUR_DB_DATA_PATH" --replSet "REPLICA_SET_INSTANCE_NAME"
+mongod --port 27017 --dbpath "D:\set up\mongodb\data" --replSet rs0
+
+to check replica set 
+
+rs.initiate()
+rs.config()
+rs.status()
+db.isMaster()
+replica on multiple machines
+rs.add("ipaddress:27017")
+
+>help
+To check current db
+db>
+db.stats()
+
+to drop database
+db.dropDatabase()
+
+post = {"title" : "My Blog Post",
+... "content" : "Here's my blog post.",
+... "date" : new Date()}
+db.blog.insert(post)
+
+db.post.insert([
+ 
+{
+title: 'MongoDB Introduction',
+portrayal: 'MongoDB is no sql database',
+by: ' j2eebrain ',
+url: 'http://www.j2eebrain.com',
+labels: ['MongoDB', 'database', 'Nosql'],
+likes: 100
+},
+ 
+{
+title: 'Nosql Database',
+depiction: 'Nosql database doesn't have tables',
+by: 'j2eebrain',
+url: 'http://www.j2eebrain.com',
+labels: ['MongoDB', 'database', 'Nosql'],
+likes: 20,
+ 
+remarks: [
+{
+user:'user1',
+message: 'My first education',
+datecreated: new Date(2014,12,11,3,33),
+like: 0
+}
+]
+}
+])
+
+
+
+
+
+
+
+
+
+
+
+db.country.update({'countryId':1},{$set:{'countryName':United States}})
+db.blog.update({'courseId':'234'},{$set:{'course':'android'}})  
+db.blog.remove({title : "My Blog Post"})
+
+db.blog.drop() 
+
+
+To start mongodb, type mongo
+
+-----------------
+show dbs
+
+---------------
+show collections
+-------------------
+Movie ---Db
+db.movies.find();
+
+> use newdb;
+switched to db newdb
+>expenditure={Rent:5000,Transport:3000,Dress:3000,Recharge:1500,
+Food:6000,Misc:4000,PlannedDate:new Date('02/26/2015')};
+>db.homebudgetdb.insert(expenditure);
+>db.homebudgetdb.find();
+
+> book = { author: 'Jamie Munro', title: '20 Recipes for Programming PhoneGap',
+published: new Date('04/03/2012') };
+{
+"author" : "Jamie Munro",
+"title" : "20 Recipes for Programming PhoneGap",
+"published" : ISODate("2012-04-03T07:00:00Z")
+}
+> db.books.insert(book);
+> db.books.find();
+{ "_id" : ObjectId("5063d1d89e302eaf24b259a0"), "author" : "Jamie Munro",
+"title" : "20 Recipes for Programming PhoneGap",
+"published" : ISODate("2012-04-03T07:00:00Z") }
+
+
+book = { title: '50 Tips and Tricks for MongoDB Developers',
+author: 'Kristina Chodorow',
+published: new Date('05/06/2011'),
+keywords: ['design', 'implementation',
+'optimization'] };
+
+db.books.update( { author: "Kristina Chodorow" },
+{ "$push": { "keywords": "developer" } } );
+
+db.books.find({}, {title:1, _id:0});
+
+-----------------------------------------------
+
+db.createCollection(<name>, { capped: <boolean>,
+                              autoIndexId: <boolean>,
+                              size: <number>,
+                              max: <number>,
+                              storageEngine: <document>,
+                              validator: <document>,
+                              validationLevel: <string>,
+                              validationAction: <string>,
+                              indexOptionDefaults: <document>,
+                              viewOn: <string>,
+                              pipeline: <pipeline>,
+                              collation: <document> } )
+
+
+db.createCollection("log", { capped : true, size : 5242880, max : 5000 } )
+This command creates a collection named log with a maximum size of 5 megabytes and a maximum of 5000 documents.
+
+db.createCollection( "contacts",
+   {
+      validator: { $or:
+         [
+            { phone: { $type: "string" } },
+            { email: { $regex: /@mongodb\.com$/ } },
+            { status: { $in: [ "Unknown", "Incomplete" ] } }
+         ]
+      }
+   }
+
+It will return error
+db.contacts.insert( { name: "Amanda", status: "Updated" } )
+db.contacts.insert( { dob: new Date(1980,3,3),phone: "9952032863", email:"eswaribala@gmail.com",status: "Updated" } )
+
+collation
+db.createCollection( "myColl", { collation: { locale: "fr" } } );
+
+Specify Storage Engine Options
+db.createCollection(
+   "users",
+   { storageEngine: { wiredTiger: { configString: "<option>=<setting>" } } }
+)
+
+db.createCollection( "contacts", { capped : true, size : 5242880, max : 5000, validator: 
+  { $and: 
+      [ 
+          { phone: { $type: "string" } }, 
+          { email: { $regex: /@mongodb\.com$/ } }, 
+          { status: { $in: [ "Unknown", "Incomplete" ] } }
+      ]
+   },
+   validationLevel : "strict",
+   validationAction : "error"
+  } 
+) 
+
+ db.test.insert({date: ISODate()})
+ db.test.insert({date: new Date()})
+var myDate = new Date(2014, 11, 12, 14, 12);
+db.collection.insert({ "date": myDate });
+
+1.create customer collection
+2.create address collection
+3.insert address data
+4. insert customer data with address ref  
+
+describe collection
+> var schematodo = db.tasks.findOne();
+> for (var key in schematodo) { print (key) ; }
+
+use bankdb;
+var col_list= db.investments.findOne();
+for (var col in col_list) { print (col) ; }
+
+
+db.collection.findAndModify({
+    query: <document>,
+    sort: <document>,
+    remove: <boolean>,
+    update: <document>,
+    new: <boolean>,
+    fields: <document>,
+    upsert: <boolean>,
+    bypassDocumentValidation: <boolean>,
+    writeConcern: <document>,
+    collation: <document>,
+    arrayFilters: [ <filterdocument1>, ... ]
+});
+db.contacts.findAndModify({
+    query: {phone: "9952032863" },
+    sort: {rating: 1 },
+    update: {$set:{status:"Unknown"}},
+    upsert: true
+})
+
+> db.foo.find()
+> db.foo.insert({"name":"abdul"})
+> db.foo.find()
+{ "_id" : ObjectId("4e93037bbf6f1dd3a0a9541a"), "name" : "abdul" }
+> item = db.foo.findOne()
+{ "_id" : ObjectId("4e93037bbf6f1dd3a0a9541a"), "name" : "abdul" }
+> db.foo.update({"_id" :ObjectId("4e93037bbf6f1dd3a0a9541a") },{$set : {"new_field":1}})
+> db.foo.find()
+{ "_id" : ObjectId("4e93037bbf6f1dd3a0a9541a"), "new_field" : 1, "name" : "abdul" }
+
+-------------------------------------------------------------
+With two collections
+db.states.insert({stateId:44,name:"TamilNadu"}
+db.cities.insert({cityId:44,name:"TamilNadu"})
+stateRef=db.states.findOne({stateId:44});
+db.cities.update({cityId:1},{$set:{state_fk:stateRef}});
+db.cities.aggregate([
+    {
+      $lookup:
+        {
+        from: "states",
+          localField: "_id",
+          foreignField: "state_fk",
+          as: "out_doc"
+        }
+   }
+])
+
+db.cities.aggregate([
+    {
+      $lookup:
+        {
+        from: "states",
+          localField: "_id",
+          foreignField: "state_fk",
+          as: "out_doc"
+        }
+   },
+
+   {
+    $out:"result"
+
+  }
+])
+
+db.resources.insert({id:1,name:"MMC"});
+resourceRef=db.resources.findOne({id:1});
+db.cities.update({cityId:1},{$set:{resource_fk:resourceRef}})
+
+
+db.address.aggregate([
+    {
+      $lookup:
+        {
+          from: "customer",
+          localField: "_id",
+          foreignField: "addressRef",
+          as: "out_doc"
+        }
+   }
+])
+
+db.address.aggregate([
+    {
+      $lookup:
+        {
+          from: "customer",
+          localField: "_id",
+          foreignField: "addressRef",
+          as: "out_doc"
+        }
+   },
+
+   {
+    $out:"result"
+
+  }
+])
+
+===============================================
+With Three collections
+db.cities.insert({cityId:1,name:"Chennai",stateId:44})
+db.resources.insert({resId:11,name:"MMC",stateId:44})
+
+db.states.aggregate([
+
+    // Join with user_info table
+    {
+        $lookup:{
+        from: "cities",       // other table name
+        localField: "stateId",   // name of users table field
+        foreignField: "stateId", // name of userinfo table field
+        as: "city_info"         // alias for userinfo table
+        }
+    },
+    {   $unwind:"$city_info" },     // $unwind used for getting data in object or for one record only
+
+    // Join with user_role table
+    {
+        $lookup:{
+        from: "resources", 
+        localField: "stateId", 
+        foreignField: "stateId",
+        as: "resource_info"
+        }
+    },
+    {   $unwind:"$resource_info" },
+
+    
+
+    // define which fields are you want to fetch
+    {   
+        $project:{
+            _id : 1,
+            stateId : 1,
+            name : 1,
+            cityName : "$city_info.name",
+            resourceName : "$resource_info.name",
+        } 
+    }
+]);
+
+
+db.states.aggregate([
+
+    // Join with user_info table
+    {
+        $lookup:{
+        from: "cities",       // other table name
+        localField: "stateId",   // name of users table field
+        foreignField: "stateId", // name of userinfo table field
+        as: "city_info"         // alias for userinfo table
+        }
+    },
+    {   $unwind:"$city_info" },     // $unwind used for getting data in object or for one record only
+
+    // Join with user_role table
+    {
+        $lookup:{
+        from: "resources", 
+        localField: "stateId", 
+        foreignField: "stateId",
+        as: "resource_info"
+        }
+    },
+    {   $unwind:"$resource_info" },
+
+    
+// define some conditions here 
+    {
+        $match:{
+        $and:[{"name" : "TamilNadu"}]
+        }
+    },
+    // define which fields are you want to fetch
+    {   
+        $project:{
+            _id : 1,
+            stateId : 1,
+            name : 1,
+            cityName : "$city_info.name",
+            resourceName : "$resource_info.name",
+        } 
+    }
+]);
+
+db.customer.aggregate(  [{
+        $lookup: {
+           from: "address",
+           localField: "addressRef",
+           foreignField: "_id",
+           as: "addressInfo"
+        }
+    },
+
+    {
+        $unwind: "$addressInfo"
+    },
+    {
+        $lookup: {
+           from: "branch",
+           localField: "branchRef",
+           foreignField: "_id",
+           as: "branchInfo"
+        }
+    }
+    ,
+
+    {
+        $unwind: "$branchInfo"
+    }
+    
+    ])
+------------------------------------------------
+ aggrgate with Projection
+db.customer.aggregate( [ { $project : { name : 1 , password : 1 } } ] )
+-----------------------------------------------------------
+
+-- 1 to include
+
+db.address.aggregate([
+    {
+      $lookup:
+        {
+          from: "customer",
+          localField: "_id",
+          foreignField: "addressRef",
+          as: "out_doc"
+        }
+   },
+	{ $project : { doorNo : 1 , streetName : 1 } }
+
+])
+-----------------------------------------------------------
+lookup with project
+
+db.address.aggregate([
+    {
+      $lookup:
+        {
+          from: "customer",
+          localField: "_id",
+          foreignField: "addressRef",
+          as: "out_doc"
+        }
+   },
+	{ $project : { doorNo : 1 , streetName : 1 , name:"$out_doc.name"} }
+
+])
+------------------------------------------------------------
+
+db.customer.aggregate(  [{
+        $lookup: {
+           from: "address",
+           localField: "addressRef",
+           foreignField: "_id",
+           as: "addressInfo"
+        }
+    },
+    {
+        $lookup: {
+           from: "branch",
+           localField: "branchRef",
+           foreignField: "_id",
+           as: "branchInfo"
+        }
+    }
+    ,
+
+    {
+         $project: {customerName:"$name",city:"$addressInfo.city",address:"$branchInfo.address"}
+    }
+    
+    ])
+
+------------------------------------------------------------
+db.createCollection( "account", { capped : false, size : 5242880, max : 5000, validator: 
+  { $and: 
+      [ 
+          { actNo: { $type: "number" } }, 
+          { type: { $in: [ "savings", "recurring" ] } }, 
+          { balance: { $type: "number" } }
+      ]
+   },
+   validationLevel : "strict",
+   validationAction : "error"
+  } 
+) 
+--------------------------------------
+db.createCollection( "transaction", { capped : false, size : 5242880,
+ max : 5000, validator: 
+  { $and: 
+      [ 
+          { tranId: { $type: "number" } }, 
+          { dot: { $type: "date" } }, 
+          { amt: { $type: "number" }},
+         {tranType:{$type:"string"}} 
+      ]
+   },
+   validationLevel : "strict",
+   validationAction : "error"
+  } 
+) 
+--------------------------------------------------------
+db.products.update(
+   { _id: 1 },
+   {
+     $set: { item: "apple" },
+     $setOnInsert: { dateAdded: new Date() }
+   },
+   { upsert: true }
+)
+----------------------
+db.transaction.insert({
+    tranId:776645,
+    dot: ISODate("2017-04-03T07:00:00Z"),
+    amt:7000,
+    tranType:"recurring"
+    
+})
+-----------------------------------------------
+var actObj=db.account.findOne({})
+print (actObj); --- will return the object
+
+db.transaction.insert({
+    tranId:773345,
+    dot: ISODate("2016-07-07T07:00:00Z"),
+    amt:7500,
+    tranType:"savings",
+    accountRef:actObj
+    
+})
+
+____________________________________________________
+Group By date
+
+db.transaction.aggregate(
+   [
+      {
+        $group : {
+           _id : { month: { $month: "$dot" }, 
+day: { $dayOfMonth: "$dot" }, 
+year: { $year: "$dot" } },
+           totalPrice: { $sum: "$amt" },
+           averageTransaction: { $avg: "$amt" },
+           count: { $sum: 1 }
+        }
+      }
+   ]
+)
+----------------------------------------------
+Group By transaction type
+
+db.transaction.aggregate(
+   [
+      {
+        $group : {
+           _id :"$tranType",
+           totalPrice: { $sum: "$amt" },
+           averageTransaction: { $avg: "$amt" },
+           count: { $sum: 1 }
+        }
+      }
+   ]
+)
+----------------------------------
+db.transaction.aggregate(
+   [
+      {
+        $group : {
+           _id :"$tranType",
+           totalPrice: { $sum: "$amt" },
+           averageTransaction: { $avg: "$amt" },
+           bonus:{$sum: { $multiply: [ "$amt", 0.1 ] }},  
+
+           count: { $sum: 1 }
+        }
+      }
+   ]
+)
+-------------------------------------------------
+db.transaction.aggregate(
+   [
+   { $match: { tranType:"savings"}},
+      {
+        $group : {
+           _id :"$tranType",
+           totalPrice: { $sum: "$amt" },
+           averageTransaction: { $avg: "$amt" },
+           bonus:{$sum: { $multiply: [ "$amt", 0.1 ] }},  
+
+           count: { $sum: 1 }
+        }
+      }
+   ]
+)
+------------------------------------------------
+Retrieve Distinct Values
+
+db.transaction.aggregate( [ { $group : { _id : "$amt" } } ] )
+------------------------------------------------------------
+Randomly selecting number of records
+
+db.transaction.aggregate(
+   [ { $sample: { size: 2 } } ]
+)
+----------------------------------------------------
+Sorting
+db.transaction.aggregate(
+   [
+     { $sort : { amt : -1, dot: 1 } }
+   ]
+)
+---------------------------------------
+index
+db.transaction.createIndex( { dot: 1, tranType: 1 } )
+-----------------------------------------------------------
+Map and Reduce
+
+var mapFunction1 = function() {
+                       emit(this.tranType, this.amt);
+                   };
+var reduceFunction1 = function(keyTranType, valuesAmt) {
+                          return Array.sum(valuesAmt);
+                      };
+                      
+db.transaction.mapReduce(
+                     mapFunction1,
+                     reduceFunction1,
+                     { out: "map_reduce_example" }
+                   ).find()
+-------------------------------------------------------------------
+Map and Reduce
+
+var mapFunction1 = function() {
+                       emit(this.tranType, this.amt);
+                   };
+var reduceFunction1 = function(keyTranType, valuesAmt) {
+			  if(keyTranType=="savings")
+                            return Array.sum(valuesAmt);
+                      };
+                      
+db.transaction.mapReduce(
+                     mapFunction1,
+                     reduceFunction1,
+                     { out: "map_reduce_example" }
+                   ).find()
+--------------------------------------------------------------
+var date=new Date();
+print(date.getFullYear());
+-----------------------------------------------
+var mapFunction1 = function() {
+                       var date = new ISODate("2013-03-19T08:27:58.001Z");
+    var year = date.getFullYear();
+    print(year);
+    //emit(year, this);
+}();   
+
+-------------------------------------------------
+Map and Reduce
+
+var mapFunction1 = function() {
+                       emit(this.dot, this.amt);
+                   };
+var reduceFunction1 = function(vdot,vamt) {
+			  if((vdot.getFullYear()==2017)&&(vdot.getMonth()==4)&&(vdot.getDay()>1))
+  
+                            return Array.sum(vamt);
+                      };
+                      
+db.transaction.mapReduce(
+                     mapFunction1,
+                     reduceFunction1,
+                     { out: "map_reduce_example" }
+                   ).find()
+
+----------------------------------------------------------------
+var mapFunction1 = function() {
+    
+   
+    var year = this.dot.getFullYear();
+                       emit(year, this.amt);
+                   };
+var reduceFunction1 = function(vdot,vamt) {
+			  if(vdot<2018)
+                          {
+                               return Array.sum(vamt);
+                          }
+                      };
+                      
+db.transaction.mapReduce(
+                     mapFunction1,
+                     reduceFunction1,
+                     { out: "map_reduce_demo" }
+                   ).find()           
+
+___________________________________________________________
+db.getCollection('account').find({},actNo:true,balance:true})
+--------------------------------------------------------------
+db.getCollection('account').find({},{actNo:true})
+--------------------------------------------------
+db.getCollection('transaction').find({tranType:"savings"},{tranId:true})
+---------------------------------------
+
+db.collection.insertOne()	Inserts a single document into a collection.
+db.collection.insertMany()	db.collection.insertMany() inserts multiple documents into a collection.
+db.collection.insert()	db.collection.insert() inserts a single document or multiple documents into a collection.
+
+Bulk insert
+db.inventory.insertMany([
+   { item: "journal", qty: 25, tags: ["blank", "red"], size: { h: 14, w: 21, uom: "cm" } },
+   { item: "mat", qty: 85, tags: ["gray"], size: { h: 27.9, w: 35.5, uom: "cm" } },
+   { item: "mousepad", qty: 25, tags: ["gel", "blue"], size: { h: 19, w: 22.85, uom: "cm" } }
+])
+
+
+db.inventory.insertMany( [
+   { item: "canvas", qty: 100, size: { h: 28, w: 35.5, uom: "cm" }, status: "A" },
+   { item: "journal", qty: 25, size: { h: 14, w: 21, uom: "cm" }, status: "A" },
+   { item: "mat", qty: 85, size: { h: 27.9, w: 35.5, uom: "cm" }, status: "A" },
+   { item: "mousepad", qty: 25, size: { h: 19, w: 22.85, uom: "cm" }, status: "P" },
+   { item: "notebook", qty: 50, size: { h: 8.5, w: 11, uom: "in" }, status: "P" },
+   { item: "paper", qty: 100, size: { h: 8.5, w: 11, uom: "in" }, status: "D" },
+   { item: "planner", qty: 75, size: { h: 22.85, w: 30, uom: "cm" }, status: "D" },
+   { item: "postcard", qty: 45, size: { h: 10, w: 15.25, uom: "cm" }, status: "A" },
+   { item: "sketchbook", qty: 80, size: { h: 14, w: 21, uom: "cm" }, status: "A" },
+   { item: "sketch pad", qty: 95, size: { h: 22.85, w: 30.5, uom: "cm" }, status: "A" }
+] );
+
+
+ db.characters.bulkWrite(
+      [
+         { insertOne :
+            {
+               "document" :
+               {
+                  "_id" : 4, "char" : "Dithras", "class" : "barbarian", "lvl" : 4
+               }
+            }
+         },
+         { insertOne :
+            {
+               "document" :
+               {
+                  "_id" : 5, "char" : "Taeln", "class" : "fighter", "lvl" : 3
+               }
+            }
+         },
+         { updateOne :
+            {
+               "filter" : { "char" : "Eldon" },
+               "update" : { $set : { "status" : "Critical Injury" } }
+            }
+         },
+         { deleteOne :
+            { "filter" : { "char" : "Brisbane"} }
+         },
+         { replaceOne :
+            {
+               "filter" : { "char" : "Meldane" },
+               "replacement" : { "char" : "Tanys", "class" : "oracle", "lvl" : 4 }
+            }
+         }
+      ]
+   );
+-----------------
+update one
+db.inventory.updateOne(
+   { item: "paper" },
+   {
+     $set: { "size.uom": "cm", status: "P" },
+     $currentDate: { lastModified: true }
+   }
+)
+
+
+update many
+db.inventory.updateMany(
+   { "qty": { $lt: 50 } },
+   {
+     $set: { "size.uom": "in", status: "P" },
+     $currentDate: { lastModified: true }
+   }
+)
+
+Replace entire document except id
+
+db.inventory.replaceOne(
+   { item: "paper" },
+   { item: "paper", instock: [ { warehouse: "A", qty: 60 }, { warehouse: "B", qty: 40 } ] }
+)
+
+
+delete many
+
+db.orders.deleteMany( { "stock" : "Brent Crude Futures", "limit" : { $gt : 48.88 } } );
+
+
+copy to
+db.source.copyTo(target)
+
+count
+
+db.collection.find( { a: 5, b: 5 } ).count()
+db.collection.find( { a: { $gt: 5 } } ).count()
+db.collection.find( { a: 5, b: { $gt: 10 } } ).count()
+
+db.collection.find( { a: 5, b: { $in: [ 1, 2, 3 ] } } ).count()
+db.collection.find( { a: { $gt: 5 }, b: 5 } ).count()
+db.collection.find( { a: 5, b: 5, c: 5 } ).count()
+
+---------------------
+create index
+single index
+compound index
+multikey index
+db.photos.insert({color:[100,100,300],spec:{name:"jpg",comp:true}});
+db.photos.createIndex({color:1})#multi key index
+db.photos.createIndex({spec.name:1})#multi key index
+
+ttl index #last modified date is field type date
+db.eventlog.createIndex( { "lastModifiedDate": 1 }, 
+{ expireAfterSeconds: 3600 } )
+
+unique index
+
+db.members.createIndex( { "user_id": 1 }, { unique: true } )
+
+db.members.createIndex( { groupNumber: 1, lastname: 1, firstname: 1 },
+ { unique: true } )
+
+partial index
+the following operation creates a compound index that 
+indexes only the documents with a rating field greater than 5.
+
+db.restaurants.createIndex(
+   { cuisine: 1, name: 1 },
+   { partialFilterExpression: { rating: { $gt: 5 } } }
+)
+
+case insensitive index
+db.createCollection("names", { collation: 
+{ locale: 'en_US', strength: 2 } } )
+
+db.names.createIndex( { first_name: 1 } ) // inherits the default collation
+
+db.names.insert( [ { first_name: "Betsy" },
+                   { first_name: "BETSY"},
+                   { first_name: "betsy"} ] )
+
+db.names.find( { first_name: "betsy" } ) #3
+
+sparse index
+db.addresses.createIndex( { "xmpp_id": 1 }, { sparse: true } )
+The index does not index documents that do not include 
+the xmpp_id field.
+
+
+db.collection.createIndex( { orderDate: 1 } )
+db.collection.createIndex( { orderDate: 1, zipcode: -1 } ) //asc and desc
+
+db.products.createIndexes( [ { "manufacturer": 1}, { "category": 1 } ],
+   { collation: { locale: "fr", strength: 2 } })
+
+db.collection.getIndexes()
+
+
+
+
+
+
+
+
+
+
+
+---------------
+db.myColl.distinct( "category", {}, { collation: { locale: "fr", strength: 1 } } )
+
+-------------------
+
+db.pets.dropIndex( { "cat" : -1 } )
+-----------------------------------------
+db.collection.ensureIndex() - deprecated
+----------------------------------------
+db.createCollection("students", {
+   validator: {
+      $jsonSchema: {
+         bsonType: "object",
+         required: [ "name", "year", "major", "gpa" ],
+         properties: {
+            name: {
+               bsonType: "string",
+               description: "must be a string and is required"
+            },
+            gender: {
+               bsonType: "string",
+               description: "must be a string and is not required"
+            },
+            year: {
+               bsonType: "int",
+               minimum: 2017,
+               maximum: 3017,
+               exclusiveMaximum: false,
+               description: "must be an integer in [ 2017, 3017 ] and is required"
+            },
+            major: {
+               enum: [ "Math", "English", "Computer Science", "History", null ],
+               description: "can only be one of the enum values and is required"
+            },
+            gpa: {
+               bsonType: [ "double" ],
+               minimum: 0,
+               description: "must be a double and is required"
+            }
+         }
+      }
+   }
+})
+
+db.createCollection( "contacts",
+   { validator: { $or:
+      [
+         { phone: { $type: "string" } },
+         { email: { $regex: /@mongodb\.com$/ } },
+         { status: { $in: [ "Unknown", "Incomplete" ] } }
+      ]
+   }
+} )
+
+db.contacts.insert([
+   { "_id": 1, "name": "Anne", "phone": "+1 555 123 456", "city": "London", "status": "Complete" },
+   { "_id": 2, "name": "Ivan", "city": "Vancouver" }
+])
+
+db.createCollection( "contacts2", {
+   validator: { $jsonSchema: {
+      bsonType: "object",
+      required: [ "phone" ],
+      properties: {
+         phone: {
+            bsonType: "string",
+            description: "must be a string and is required"
+         },
+         email: {
+            bsonType : "string",
+            pattern : "@mongodb\.com$",
+            description: "must be a string and match the regular expression pattern"
+         },
+         status: {
+            enum: [ "Unknown", "Incomplete" ],
+            description: "can only be one of the enum values"
+         }
+      }
+   } },
+   validationAction: "warn"
+} )
+
+db.contacts2.insert( { name: "Amanda", status: "Updated" } )
+
+
+
+-----------------
+
+--------------------
+collation strength
+
+Value	Description
+1	Primary level of comparison. Collation performs comparisons 
+of the base characters only, ignoring other differences such as diacritics and case.
+2	Secondary level of comparison. Collation performs comparisons 
+up to secondary differences, such as diacritics. That is, collation performs comparisons of base characters (primary differences) and diacritics (secondary differences). Differences between base characters takes precedence over secondary differences.
+3	
+Tertiary level of comparison. Collation performs comparisons up to tertiary differences, such as case and letter variants. That is, collation performs comparisons of base characters (primary differences), diacritics (secondary differences), and case and variants (tertiary differences). Differences between base characters takes precedence over secondary differences, which takes precedence over tertiary differences.
+
+This is the default level.
+
+4	Quaternary Level. Limited for specific use case to consider 
+punctuation when levels 1-3 ignore punctuation or for processing Japanese text.
+5	Identical Level. Limited for specific use case of tie breaker.s
+
+
+

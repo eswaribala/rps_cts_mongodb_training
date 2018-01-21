@@ -1,0 +1,70 @@
+MONGODB STORAGE INTERNALS
+File System
+
+mongod.lock: 6bytes
+test.ns: 16mb – namespace file
+test.0: 64mb
+test.1: 128mb
+test.2: 256mb
+…
+test.30: 2GB
+
+the next chunk file is pre-allocated
+
+MMAP
+
+Maps a file (ex. test.0) on disk into Virtual memory (not physical RAM)
+
+Namespace
+
+A giant hashtable with ~1kb blocks
+
+Name: test.foo
+Stats: size, count, etc
+2gb file limit = 2 million namespaces
+First extent (disk loc 8b)
+last extent (disk loc 8b)
+deleted list19 (disk loc 8b)
+Index data (offset 4b)
+disk loc – pointer to a location on a disk
+
+DiskLoc{
+ int fileNum; //the '0' in test.0
+ int offset; //position in file
+} //64 bit
+Data files
+
+Managed by doubly-linked list that gets iterated for scanning documents
+
+Extent
+myLoc
+nextExtent
+prevExtent
+firstRecord
+lastRecord
+length with headers
+data
+Record
+Length with headers
+extentOfs – from self
+nextRec
+prevRec
+data – maybe larger than object if padding is > 1 (Each collection has padding factor)
+Compaction process exists for deletion because a record is only marked deleted and you’ll have holes in the data files. This can be triggered by a command.
+
+B-tree
+
+Fixed size, 8 kb buckets used in Mongo
+
+Parent
+R child
+key nodes (sorted)
+left child (8)
+data record (8)
+key offset (2)
+key objects (unsorted)
+Field names do not get stored in index so reducing the length of field name doesn’t impact index size or optimization
+
+Random notes
+
+RAID 1 or RAID 10 recommended

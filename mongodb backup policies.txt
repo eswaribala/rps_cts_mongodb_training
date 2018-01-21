@@ -1,0 +1,17 @@
+1.Back Up with Atlas
+2.Back Up with MongoDB Cloud Manager or Ops Manager
+3.Back Up by Copying Underlying Data Files
+4.Back Up with mongodump
+
+MongoDB Tools
+
+MongoDB Cloud Manager
+
+
+
+Manual Backup with mongodump
+
+mongodump reads data from a MongoDB database and creates high fidelity BSON files which the mongorestore tool can use to populate a MongoDB database. mongodump and mongorestore are simple and efficient tools for backing up and restoring small MongoDB deployments, but are not ideal for capturing backups of larger systems.
+Backing Up File System Snapshots
+
+You can create a backup of a MongoDB deployment by making a copy of MongoDB’s underlying data files.
