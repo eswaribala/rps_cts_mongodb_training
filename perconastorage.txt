@@ -1,0 +1,25 @@
+Third party storage engine
+rocksdb
+tokumx
+db.serverStatus().storageEngine;
+
+mongod --port 15000 --storageEngine=rocksdb --dbpath=./
+---------------
+ops manager
+create ec2 instance with x-large memory space
+sudo rpm -ivh mongodb-mms-<version>.x86_64.rpm
+to incease process
+sudo bash
+#ulimit -n 64000
+#sudo service mongodb-mms start
+if already started
+#sudo service mongodb-mms restart
+sudo /etc/init.d/mongodb-mms start
+http://<OpsManagerHost>:8080
+
+to check the status
+#service mongodb-mms status
+ to make ec2 instance run on http 
+add all tcp in security group 
+or 
+we can add use custom protocol option in security group 
