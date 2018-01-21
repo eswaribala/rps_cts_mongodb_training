@@ -1,0 +1,97 @@
+1.Linux ec2 and manually install mongodb. -- done
+2.multi 
+multi	boolean	Optional. If set to true, 
+updates multiple documents that meet the query 
+criteria. If set to false, updates one document. 
+The default value is false. 
+
+3.many  -- done
+4.combining collections -- done
+5. db internals
+6. back up and restore options
+  6a. mongodump --collection userdetails --db myinfo
+7. admin,config files
+8. admin db missing mongodb 3.2
+9. dropping user drops the collection created by him? -- no
+10. how to grant privilege to specific collection? --yes
+11.how to describe the collection? -- yes -- for loop
+12. how to revoke privileges? --done
+13. custom roles?--done
+14.list empty database?  MangoDB doesn’t create any database yet, until you save something inside.
+15. can we check logged in user? 
+db.runCommand({connectionStatus : 1})
+16. taking backup in tape?
+17. incremental backup?
+mongodump --host <secondary> -d local -c oplog.rs -o /mnt/mongo-test_backup/1 
+    --query '{ "ts" : { $gt :  Timestamp(1437725201, 50) } }'
+18. backup log file?
+19. self managed Retention backup?TTL
+20.What are the files it creates at the system level when the Storage engine differs? done
+
+21. selective restore
+
+mongorestore \
+  --collection pages \
+  --filter '{ "site_id": ObjectId("...") }' \
+  production-dump/pages.bson
+
+22.ensuring all the secondaries are update with primary latest data.
+rs.printSlaveReplicationInfo()
+23.arbiter, priority creation, hidden
+rs.addarb("localhost:270122")
+cfg = rs.conf()
+cfg.members[0].priority = 0.5
+cfg.members[1].priority = 2
+cfg.members[2].priority = 2
+rs.reconfig(cfg)#reconfigure
+#hidden
+cfg = rs.conf()
+cfg.members[0].priority = 0
+cfg.members[0].hidden = true
+rs.reconfig(cfg)
+
+#delayed
+cfg = rs.conf()
+cfg.members[0].priority = 0
+cfg.members[0].hidden = true
+cfg.members[0].slaveDelay = 3600
+rs.reconfig(cfg)
+
+#non voting
+cfg.members[3].votes = 0;
+cfg.members[3].priority = 0;
+cfg.members[4].votes = 0
+cfg.members[4].priority = 0;
+cfg.members[5].votes = 0
+cfg.members[5].priority = 0;
+
+24.replicating specific database to specific secondary server
+The filtered replication is not something that is currently implemented in MongoDB out of the box.
+
+25. could you please give us any troubleshooting tips in real time scenarios when we have any issues with replication? 
+Check Replica Set Status
+rs.status()
+check replica lag
+In a mongo shell connected to the primary, call the rs.printSlaveReplicationInfo()
+network latency
+concurrency
+write concern
+rs.printReplicationInfo() #check oplog size
+
+oplog time stamp issues
+db = db.getSiblingDB("local")
+db.oplog.rs.find().sort({$natural:-1}).limit(1)
+db.oplog.rs.find({ts:{$type:17}}).sort({$natural:-1}).limit(1)
+
+
+26.in mongo db opslog would it be only the collection or file?
+Oplog stores high-level transactions that modify the database (queries are not stored for example), like insert this document, update that, etc. Oplog is kept on the master and slaves will periodically poll the master to get newly performed operations (since the last poll).
+oplog is collection file created is oplog.rs.bson
+27.why arbiter
+Arbiters are mongod instances that are part of a replica set but do not hold data. Arbiters participate in elections in order to break ties. If a replica set has an even number of members, add an arbiter.
+
+Arbiters have minimal resource requirements and do not require dedicated hardware. You can deploy an arbiter on an application server or a monitoring host.
+
+
+
+

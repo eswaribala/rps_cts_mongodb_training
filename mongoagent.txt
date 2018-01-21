@@ -1,0 +1,8 @@
+curl -OL http://35.154.28.242:8080/download/agent/automation/mongodb-mms-automation-agent-manager-4.5.10.2429-1.x86_64.rpm
+sudo rpm -U mongodb-mms-automation-agent-manager-4.5.10.2429-1.x86_64.rpm
+sudo vi /etc/mongodb-mms/automation-agent.config
+mmsGroupId=5a64578a7e34ea0f3247969e
+mmsApiKey=5a6458bf7e34ea0f32479721d6d0a2475c34a2eb64b852cfc8fcd755
+mmsBaseUrl=http://35.154.28.242:8080
+sudo service mongodb-mms-automation-agent start
+sudo /sbin/service mongodb-mms-automation-agent start
