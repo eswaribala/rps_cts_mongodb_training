@@ -1,0 +1,44 @@
+1.pwd
+/home/ec2-user
+2.mkdir cluster
+3.go to cluster
+4.mkdir primary1-pc
+5.mkdir secondary1-pc
+6.mkdir secondary2-pc
+7.mkdir secondary3-pc
+8.go to primary1-pc
+9.create data folder
+10.go to data, create db and log folders
+11. repeat this for all the machines
+12.Create four config files
+13. go to home
+14. mkdir PCS
+15.go to PCS
+16. mkdir configs
+17. inside configs, create mongod-primary1.conf
+18.repeat for 4 PCS with mongod-secondary1.conf and so on
+19.mongod --config /home/ec2-user/PCS/dev1-pc/configs/mongod-primary1.conf 
+20.
+
+21.go duplicate session
+
+22.mongo --port 27018
+23.rs.initiate()
+24.rs.status()
+25.mongod --config /home/ec2-user/PCS/dev2-pc/configs/mongod-secondary1.conf 
+26. come back to primary
+rs.add( "localhost:27019" )
+rs.status()
+27.mongod --config /home/ec2-user/PCS/dev3-pc/configs/mongod-secondary2.conf 
+28.go back to primary
+29. rs.addArb("localhost:27020");
+30.  goto secondary2
+31. rs.initiate();
+
+
+
+
+ 
+
+
+

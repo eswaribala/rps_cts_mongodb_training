@@ -1,0 +1,9 @@
+systemLog:
+    destination: file
+    path: /home/ec2-user/cluster/secondary1-pc/data/log/mongod.log
+storage:
+    dbPath: /home/ec2-user/cluster/secondary1-pc/data/db
+net:
+    port: 27019
+replication:
+    replSetName: repl1
